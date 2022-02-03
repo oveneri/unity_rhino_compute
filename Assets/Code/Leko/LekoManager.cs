@@ -1,19 +1,15 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Rhino.Compute;
 
-
-public class ComputeTest : MonoBehaviour
+public class LekoManager : MonoBehaviour
 {
+    public static LekoManager Instance { get; private set; }
+
     // Start is called before the first frame update
     void Start()
     {
-        // Set Rhino Compute server info
         ComputeServer.WebAddress = "http://localhost:8081";
     }
 
@@ -28,7 +24,9 @@ public class ComputeTest : MonoBehaviour
         if (GUILayout.Button("Create Cube"))
         {
             LekoObject cube = LekoCore.CreateCube();
-            cube.transform.parent = transform.parent;
+            cube.transform.parent = transform;
         }
     }
+
+
 }

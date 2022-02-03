@@ -71,23 +71,83 @@ static class LekoCore
             meshObj.Vertices.Add(meshVertex.x, meshVertex.z, meshVertex.y);
         }
 
-        int triCount = unityMesh.triangles.Length / 3;
-        meshObj.Faces.Capacity = triCount;
+        int faceCount = unityMesh.triangles.Length / 3;
+        meshObj.Faces.Capacity = faceCount;
 
-        for (int i = 0; i < triCount; i+=3)
+        for (int i = 0; i < unityMesh.triangles.Length; i+=3)
         {
             meshObj.Faces.AddFace(unityMesh.triangles[i+2], unityMesh.triangles[i+1], unityMesh.triangles[i]);
         }
 
-        int faceCount = unityMesh.normals.Length;
-        meshObj.Normals.Capacity = faceCount;
+        int normalCount = unityMesh.normals.Length;
+        meshObj.Normals.Capacity = normalCount;
 
-        for (int i = 0; i < faceCount; i++)
+        for (int i = 0; i < normalCount; i++)
         {
             Vector3 tmpNormal = unityMesh.normals[i];
             meshObj.Normals.Add(tmpNormal.x, tmpNormal.z, tmpNormal.y);
         }
 
+        meshObj.Compact();
+
         return meshObj;
+    }
+
+    /// <summary>
+    /// Convert matrix from Rhino to Unity format
+    /// </summary>
+    /// <param name="rhinoMatrix"></param>
+    /// <returns></returns>
+    public static Matrix4x4 RhinoToUnityTransform(Rhino.Geometry.Transform rhinoMatrix)
+    {
+        return Matrix4x4.identity;
+    }
+
+    /// <summary>
+    /// Convert matrix from  Unity to Rhino format
+    /// </summary>
+    /// <param name="unityMatrix"></param>
+    /// <returns></returns>
+    public static Rhino.Geometry.Transform UnityToRhinoTransform(Matrix4x4 unityMatrix)
+    {
+        return new Rhino.Geometry.Transform();
+    }
+
+    /// <summary>
+    /// Compute the volume of the LekoObject
+    /// </summary>
+    /// <param name="lekoObj"></param>
+    /// <returns></returns>
+    public static double GetVolume(LekoObject lekoObj)
+    {
+        Rhino.Geometry.Brep tmpBrep = lekoObj.GetRhinoBrep();
+        if (tmpBrep == null)
+        {
+            return 0.0f;
+        }
+
+        return BrepCompute.GetVolume(tmpBrep); 
+    }
+
+    /// <summary>
+    /// Creates a cube
+    /// </summary>
+    /// <returns></returns>
+    public static LekoObject CreateCube()
+    {
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        LekoObject lekoObj = cube.AddComponent<LekoObject>();
+
+        var rhinoBox = new Rhino.Geometry.Box(new Rhino.Geometry.BoundingBox(-0.5,-0.5, -0.5, 0.5, 0.5, 0.5));
+        lekoObj.m_internalRepresentation = rhinoBox.ToBrep();
+
+        var mesh = MeshCompute.CreateFromBrep(lekoObj.m_internalRepresentation);
+        cube.GetComponent<MeshFilter>().mesh = RhinoToUnityMesh(mesh[0]);
+        cube.GetComponent<MeshFilter>().mesh.RecalculateBounds();
+        cube.GetComponent<MeshFilter>().mesh.RecalculateNormals();
+
+        lekoObj.m_internalRepresentation.Translate(new Rhino.Geometry.Vector3d(3, 4, 5));
+
+        return lekoObj;
     }
 }

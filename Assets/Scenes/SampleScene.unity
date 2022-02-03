@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 672294387}
   - component: {fileID: 672294386}
   m_Layer: 0
-  m_Name: Root
+  m_Name: LekoManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -149,7 +149,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 672294385}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1361a9bbd57677149a9d7990efe9e428, type: 3}
+  m_Script: {fileID: 11500000, guid: 39d1dee61a0e91740b76c9943b1d4e5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &672294387
@@ -313,7 +313,7 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: -1
+  m_Depth: 10
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
