@@ -1,19 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Rhino.Compute;
 
 public class LekoObject : MonoBehaviour
 {
-    public Rhino.Geometry.Brep GetRhinoBrep()
-    {
-        return m_internalRepresentation;
-    }
-
-    LekoObject()
-    {
-    }
-
     public Rhino.Geometry.Brep GetWithTransfornmApplied()
     {
         Rhino.Geometry.Brep tmpBrep = m_internalRepresentation.DuplicateBrep();
@@ -24,6 +12,19 @@ public class LekoObject : MonoBehaviour
         }
 
         return tmpBrep;
+    }
+
+    void OnMouseDown()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("Volume is: " + LekoCore.GetVolume(this));
+        }
+        else if (Input.GetMouseButtonDown(1))
+        {
+            GameObject.Destroy(this.gameObject);
+        }
+
     }
 
     public Rhino.Geometry.Brep m_internalRepresentation;

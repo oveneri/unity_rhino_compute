@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Rhino.Compute;
 
 public class LekoManager : MonoBehaviour
 {
@@ -10,7 +7,7 @@ public class LekoManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ComputeServer.WebAddress = "http://localhost:8081";
+        Rhino.Compute.ComputeServer.WebAddress = "http://localhost:8081";
     }
 
 
