@@ -16,15 +16,9 @@ public class LekoManager : MonoBehaviour
 
     void OnGUI()
     {
-        if (GUILayout.Button("Create Cube 1"))
+        if (GUILayout.Button("Create Cube"))
         {
             LekoObject cube = LekoCore.CreateCube(0.5f);
-            cube.transform.parent = transform;
-        }
-
-        if (GUILayout.Button("Create Sphere"))
-        {
-            LekoObject cube = LekoCore.CreateSphere(1);
             cube.transform.parent = transform;
         }
 
