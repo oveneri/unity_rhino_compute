@@ -27,7 +27,7 @@ public class ComputeTest : MonoBehaviour
     {
         if (GUILayout.Button("Create Cube"))
         {
-            LekoObject cube = LekoCore.CreateCube();
+            LekoObject cube = LekoCore.CreateCube(1);
             cube.transform.parent = transform.parent;
         }
     }

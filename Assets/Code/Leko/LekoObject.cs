@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Rhino.Compute;
 
 public class LekoObject : MonoBehaviour
 {
@@ -15,19 +16,6 @@ public class LekoObject : MonoBehaviour
 
     private void Update()
     {
-        if (m_internalRepresentation == null)
-        {
-            return;
-        }
-
-        m_internalRepresentation.Transform(Rhino.Geometry.Transform.Translation(transform.position.x, transform.position.z, transform.position.y));
-        m_internalRepresentation.Transform(Rhino.Geometry.Transform.Scale(Rhino.Geometry.Plane.Unset, transform.localScale.x, transform.localScale.z, transform.localScale.y));
-
-        /*if(!m_internalRepresentation.Transform(LekoCore.UnityToRhinoTransform(transform.localToWorldMatrix)))
-        {
-            Debug.Log("Transform failed!");
-        }*/
-
     }
 
     private void OnMouseDown()
@@ -35,5 +23,18 @@ public class LekoObject : MonoBehaviour
         //LekoCore.RefreshRhinoRepresentation(this);
     }
 
+    public Rhino.Geometry.Brep GetWithTransfornmApplied()
+    {
+        Rhino.Geometry.Brep tmpBrep = m_internalRepresentation.DuplicateBrep(); 
+        if (tmpBrep != null)
+        {
+            tmpBrep.Transform(Rhino.Geometry.Transform.Scale(Rhino.Geometry.Plane.Unset, transform.localScale.x, transform.localScale.z, transform.localScale.y));
+            tmpBrep.Transform(Rhino.Geometry.Transform.Translation(transform.position.x, transform.position.z, transform.position.y));
+        }
+
+        return tmpBrep;
+    }
+
     public Rhino.Geometry.Brep m_internalRepresentation;
+    public Rhino.Geometry.Mesh[] m_meshList;
 }

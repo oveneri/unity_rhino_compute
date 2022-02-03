@@ -5,6 +5,7 @@ using Rhino.Compute;
 
 static class LekoCore
 {
+    const double tolerance = 1.0e-8;
     /// <summary>
     /// Convert mesh from Rhino to Unity
     /// </summary>
@@ -12,6 +13,11 @@ static class LekoCore
     /// <returns></returns>
     public static void RhinoToUnityMesh(GameObject parent, Rhino.Geometry.Mesh[] rhinoMeshList)
     {
+        foreach (Transform child in parent.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+
         foreach (var rhinoMesh in rhinoMeshList)
         {
             Mesh meshObj = new Mesh();
@@ -25,7 +31,7 @@ static class LekoCore
                 var vertex = new Vector3(meshVertex.X, meshVertex.Z, meshVertex.Y);
                 vertices.Add(vertex);
             }
-            
+
             foreach (var meshFace in rhinoMesh.Faces)
             {
                 if (meshFace.IsTriangle)
@@ -44,7 +50,7 @@ static class LekoCore
                     triangles.Add(meshFace.A);
                 }
             }
-            
+
             foreach (var normal in rhinoMesh.Normals)
             {
                 normals.Add(new Vector3(normal.X, normal.Z, normal.Y));
@@ -83,9 +89,9 @@ static class LekoCore
         int faceCount = unityMesh.triangles.Length / 3;
         meshObj.Faces.Capacity = faceCount;
 
-        for (int i = 0; i < unityMesh.triangles.Length; i+=3)
+        for (int i = 0; i < unityMesh.triangles.Length; i += 3)
         {
-            meshObj.Faces.AddFace(unityMesh.triangles[i+2], unityMesh.triangles[i+1], unityMesh.triangles[i]);
+            meshObj.Faces.AddFace(unityMesh.triangles[i + 2], unityMesh.triangles[i + 1], unityMesh.triangles[i]);
         }
 
         int normalCount = unityMesh.normals.Length;
@@ -135,7 +141,7 @@ static class LekoCore
             return 0.0f;
         }
 
-        return BrepCompute.GetVolume(tmpBrep); 
+        return BrepCompute.GetVolume(tmpBrep);
     }
 
     public static void RefreshRhinoRepresentation(LekoObject lekoObj)
@@ -144,25 +150,67 @@ static class LekoCore
         RhinoToUnityMesh(lekoObj.gameObject, meshList);
     }
 
-    /// <summary>
-    /// Creates a cube
-    /// </summary>
-    /// <returns></returns>
-    public static LekoObject CreateCube()
+    public static LekoObject FromBrep(Rhino.Geometry.Brep brep)
+    {
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        LekoObject lekoObj = cube.AddComponent<LekoObject>();
+        lekoObj.m_internalRepresentation = brep;
+        lekoObj.m_meshList = MeshCompute.CreateFromBrep(lekoObj.m_internalRepresentation);
+        RhinoToUnityMesh(lekoObj.gameObject, lekoObj.m_meshList);
+
+        return lekoObj;
+    }
+
+    public static LekoObject CreateSphere(float radius)
+    {
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        LekoObject lekoObj = cube.AddComponent<LekoObject>();
+
+
+        var rhinoSphere = new Rhino.Geometry.Sphere(new Rhino.Geometry.Point3d(0,0,0), radius);
+
+        lekoObj.m_internalRepresentation = rhinoSphere.ToBrep();
+
+        lekoObj.m_meshList = MeshCompute.CreateFromBrep(lekoObj.m_internalRepresentation);
+        RhinoToUnityMesh(lekoObj.gameObject, lekoObj.m_meshList);
+
+        return lekoObj;
+    }
+
+    public static LekoObject CreateCube(float halfSize)
     {
         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
         LekoObject lekoObj = cube.AddComponent<LekoObject>();
 
 
-        Rhino.Geometry.Point3d pt0 = new Rhino.Geometry.Point3d(-0.5, -0.5, -0.5);
-        Rhino.Geometry.Point3d pt1 = new Rhino.Geometry.Point3d(0.5, 0.5, 0.5);
-        Rhino.Geometry.BoundingBox rhinoBox = new Rhino.Geometry.BoundingBox(pt0, pt1);
+        Rhino.Geometry.Point3d pt0 = new Rhino.Geometry.Point3d(-halfSize, -halfSize, -halfSize);
+        Rhino.Geometry.Point3d pt1 = new Rhino.Geometry.Point3d(halfSize, halfSize, halfSize);
+        Rhino.Geometry.Box rhinoBox = new Rhino.Geometry.Box(new Rhino.Geometry.BoundingBox(pt0, pt1));
 
         lekoObj.m_internalRepresentation = rhinoBox.ToBrep();
 
-        var meshList = MeshCompute.CreateFromBrep(lekoObj.m_internalRepresentation);
-        RhinoToUnityMesh(lekoObj.gameObject, meshList);
+        lekoObj.m_meshList = MeshCompute.CreateFromBrep(lekoObj.m_internalRepresentation);
+        RhinoToUnityMesh(lekoObj.gameObject, lekoObj.m_meshList);
 
+        return lekoObj;
+    }
+
+    public static LekoObject BooleanIntersection(LekoObject first, LekoObject second)
+    {
+        Rhino.Geometry.Brep[] intersection = Rhino.Compute.BrepCompute.CreateBooleanIntersection(new Rhino.Geometry.Brep[] { first.GetWithTransfornmApplied() }, new Rhino.Geometry.Brep[] { second.GetWithTransfornmApplied() }, tolerance);
+
+        if (intersection == null || intersection.Length == 0)
+        {
+            return null;
+        }
+
+        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        LekoObject lekoObj = cube.AddComponent<LekoObject>();
+
+        lekoObj.m_internalRepresentation = intersection[0];
+
+        lekoObj.m_meshList = MeshCompute.CreateFromBrep(lekoObj.m_internalRepresentation);
+        RhinoToUnityMesh(lekoObj.gameObject, lekoObj.m_meshList);
         return lekoObj;
     }
 }
