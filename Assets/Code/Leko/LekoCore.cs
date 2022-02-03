@@ -125,7 +125,38 @@ static class LekoCore
     /// <returns></returns>
     public static Rhino.Geometry.Transform UnityToRhinoTransform(Matrix4x4 unityMatrix)
     {
-        return new Rhino.Geometry.Transform();
+        var other = new Matrix4x4();
+
+        other.SetColumn(0, new Vector4(1, 0, 0, 0));
+        other.SetColumn(1, new Vector4(0, 0, 1, 0));
+        other.SetColumn(2, new Vector4(0, -1, 0, 0));
+        other.SetColumn(3, new Vector4(0, 0, 0, 1));
+
+        Matrix4x4 tmp = other * unityMatrix;
+
+        Rhino.Geometry.Transform rhinoTransform = new Rhino.Geometry.Transform();
+
+        rhinoTransform[0, 0] = tmp[0, 0];
+        rhinoTransform[1, 0] = tmp[1, 0];
+        rhinoTransform[2, 0] = tmp[2, 0];
+        rhinoTransform[3, 0] = tmp[3, 0];
+
+        rhinoTransform[0, 1] = tmp[0, 1];
+        rhinoTransform[1, 1] = tmp[1, 1];
+        rhinoTransform[2, 1] = tmp[2, 1];
+        rhinoTransform[3, 1] = tmp[3, 1];
+
+        rhinoTransform[0, 2] = tmp[0, 2];
+        rhinoTransform[1, 2] = tmp[1, 2];
+        rhinoTransform[2, 2] = tmp[2, 2];
+        rhinoTransform[3, 2] = tmp[3, 2];
+
+        rhinoTransform[0, 3] = tmp[0, 3];
+        rhinoTransform[1, 3] = tmp[1, 3];
+        rhinoTransform[2, 3] = tmp[2, 3];
+        rhinoTransform[3, 3] = tmp[3, 3];
+
+        return rhinoTransform;
     }
 
     /// <summary>

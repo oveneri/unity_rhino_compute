@@ -14,22 +14,13 @@ public class LekoObject : MonoBehaviour
     {
     }
 
-    private void Update()
-    {
-    }
-
-    private void OnMouseDown()
-    {
-        //LekoCore.RefreshRhinoRepresentation(this);
-    }
-
     public Rhino.Geometry.Brep GetWithTransfornmApplied()
     {
-        Rhino.Geometry.Brep tmpBrep = m_internalRepresentation.DuplicateBrep(); 
+        Rhino.Geometry.Brep tmpBrep = m_internalRepresentation.DuplicateBrep();
         if (tmpBrep != null)
         {
-            tmpBrep.Transform(Rhino.Geometry.Transform.Scale(Rhino.Geometry.Plane.Unset, transform.localScale.x, transform.localScale.z, transform.localScale.y));
-            tmpBrep.Transform(Rhino.Geometry.Transform.Translation(transform.position.x, transform.position.z, transform.position.y));
+            Rhino.Geometry.Transform rhinoTransform = LekoCore.UnityToRhinoTransform(transform.localToWorldMatrix);
+            tmpBrep.Transform(rhinoTransform);
         }
 
         return tmpBrep;
