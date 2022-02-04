@@ -73,16 +73,6 @@ static class LekoCore
     }
 
     /// <summary>
-    /// Convert matrix from Rhino to Unity format
-    /// </summary>
-    /// <param name="rhinoMatrix"></param>
-    /// <returns></returns>
-    public static Matrix4x4 RhinoToUnityTransform(Rhino.Geometry.Transform rhinoMatrix)
-    {
-        return Matrix4x4.identity;
-    }
-
-    /// <summary>
     /// Convert matrix from  Unity to Rhino format
     /// </summary>
     /// <param name="unityMatrix"></param>
